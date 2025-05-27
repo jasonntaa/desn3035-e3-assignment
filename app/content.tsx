@@ -1,29 +1,41 @@
-"use client"
 
 import React from "react";
 import "bootstrap/dist/css/bootstrap.css";
+import { useEffect, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
 
-export default function Content() {
+const supabase = createClient(process.env.NEXT_PUBLIC_VITE_SUPABASE_URL, process.env.NEXT_PUBLIC_VITE_SUPABASE_ANON_KEY);
 
-    return <>
-        <div className="container py-5">
+function App() {
+    const [countries, setCountries] = useState([]);
 
-            <div className="row justify-content-center">
-                <div className="col-lg-6">
+    useEffect(() => {
+        getCountries();
+    }, []);
 
-                    <h1 className="text-center m-0 mb-3">Country List</h1>
+    async function getCountries() {
+        const { data } = await supabase.from("countries").select();
+        setCountries(data);
+    }
 
-                    <ul className="list-group">
-                        <li className="list-group-item">🇨🇦 Canada</li>
-                        <li className="list-group-item">🇺🇸 United States</li>
-                        <li className="list-group-item">🇧🇷 Brazil</li>
-                    </ul>
-
-                    <p className="text-center mt-2 text-muted">TODO: Connect to database</p>
-
+    return (
+        <>
+            <div>
+                <div className="container py-5">
+                    <div className="row justify-content-center">
+                        <div className="col-lg-6">
+                            <h1 className="text-center m-0 mb-3">Country List</h1>
+                            <ul className="list-group">
+                                {countries.map((countries) => (
+                                    <li className="list-group-item" key={countries.name}>{countries.emoji} {countries.name}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-        </div>
-    </>
+        </>
+    );
 }
+
+export default App;
